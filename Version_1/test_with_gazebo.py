@@ -58,6 +58,9 @@ def set_drone_speed(speed: int):
 def get_action(agent: QLearningAgent,speed: int, distance: int) -> int:
     """Determine the action based on speed and distance"""
 
+    if distance > 31:
+        distance = 31
+
     state = np.array([speed, distance])
     action = agent.choose_action(state, test=True)
 
