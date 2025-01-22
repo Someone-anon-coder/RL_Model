@@ -1,6 +1,5 @@
 import gi
 import cv2
-import time
 import numpy as np
 
 gi.require_version('Gst', '1.0')
