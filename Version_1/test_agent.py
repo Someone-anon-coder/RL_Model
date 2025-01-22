@@ -5,8 +5,11 @@ from Agent import QLearningAgent
 
 def test_agent() -> None:
     env = DroneEnv()
+    env.reset()
+
     agent = QLearningAgent(env)
-    agent.load_agent()
+    agent.load_agent("agent_2.pkl")
+    # agent.load_agent()
 
     while True:
         done = False
@@ -49,3 +52,10 @@ def test_agent() -> None:
 
 if __name__ == "__main__":
     test_agent()
+    # env = DroneEnv()
+    # env.set_variables(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
+    
+    # agent = QLearningAgent(env)
+    # agent.load_agent()
+
+    # print(f"Q values: {agent.q_table}")

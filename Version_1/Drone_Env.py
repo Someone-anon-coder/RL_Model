@@ -27,51 +27,26 @@ class DroneEnv():
         self.yellow = (255, 255, 0)
         self.black = (0, 0, 0)
     
-    def set_variables(self, target_position: tuple | None = None) -> None:
-        """
-            Set the variables of the environment.
-
-            Args:
-                target_position (tuple): The position of the target.
-        """
-        
-        self.drone_position = (self.screen_width // 10, self.screen_height // 2)
-        
-        if target_position is not None:
-            self.target_position = target_position
-        else:
-            self.target_position = (self.screen_width + 1, self.screen_height // 2)
-
-        self.distance_5_meter_position = (self.target_position[0] - (5 * self.scale), self.target_position[0] - (5 * self.scale))
-        self.distance_7_meter_position = (self.target_position[0] - (7 * self.scale), self.target_position[0] - (7 * self.scale))
-        self.distance_30_meter_position = (self.drone_position[0] + (30 * self.scale), self.drone_position[0] + (30 * self.scale))
-
-        self.drone_speed = 1
-        self.max_speed = 5
-        
-        self.drone_distance = abs(self.target_position[0] - (self.drone_position[0] + self.drone_dimension)) // self.scale
-        self.max_distance = 30
-
-        self.target_distance_range = (0, 5)
-        self.speed_step = 1
-
-        print(f"Drone position: {self.drone_position[0]}")
-        print(f"Target position: {self.target_position[0]}")
-        print(f"Drone Distance: {self.drone_distance}")
-
-        self.state = np.array([self.drone_speed, self.drone_distance if self.drone_distance < 31 else 31])
-
     def reset(self, target_position: tuple | None = None) -> np.array:
         """
             Reset the environment to the initial state.
+
+            Args:
+                target_position (tuple): The position of the target. Defaults to None.
 
             Returns:
                 np.array: The initial state of the environment.
         """
 
         self.drone_speed = 1
+        self.max_speed = 5
+        
         self.speed_step = 1
+        self.max_distance = 30
 
+        self.target_distance_range = (0, 5)
+
+        self.drone_position = (self.screen_width // 10, self.screen_height // 2)
         if target_position is not None:
             self.target_position = target_position
         else:
@@ -79,12 +54,15 @@ class DroneEnv():
 
         self.drone_distance = abs(self.target_position[0] - (self.drone_position[0] + self.drone_dimension)) // self.scale
 
-        self.distance_5_meter_position = (self.target_position[0] - (5 * self.scale), self.target_position[0] - (5 * self.scale))
-        self.distance_7_meter_position = (self.target_position[0] - (7 * self.scale), self.target_position[0] - (7 * self.scale))
-        self.distance_30_meter_position = (self.drone_position[0] + (30 * self.scale), self.drone_position[0] + (30 * self.scale))
+        self.distance_5_meter_position = (self.target_position[0] - (self.target_distance_range[1] * self.scale), self.target_position[0] - (self.target_distance_range[1] * self.scale))
+        self.distance_7_meter_position = (self.target_position[0] - ((self.target_distance_range[1] + 2) * self.scale), self.target_position[0] - ((self.target_distance_range[1] + 2) * self.scale))
+        self.distance_30_meter_position = (self.drone_position[0] + (self.max_distance * self.scale), self.drone_position[0] + (self.max_distance * self.scale))
         
+        print(f"Drone position: {self.drone_position[0]}")
+        print(f"Target position: {self.target_position[0]}")
+        print(f"Speed: {self.drone_speed} | Distance: {self.drone_distance}")
+
         self.state = np.array([self.drone_speed, self.drone_distance if self.drone_distance < 31 else 31])  # Reset to initial speed and max distance
-        
         return self.state
     
     def step(self, action: int) -> tuple:
@@ -120,12 +98,16 @@ class DroneEnv():
         self.target_position = (self.target_position[0] - self.drone_speed * self.scale, self.target_position[1])
         self.state = np.array([self.drone_speed, self.drone_distance if self.drone_distance < 31 else 31])
 
-        if self.target_distance_range[0] <= self.drone_distance <= self.target_distance_range[1]:
-            reward = 10 // self.speed_step
+        if (self.target_distance_range[0] <= self.drone_distance <= self.target_distance_range[1]) and self.drone_speed == 0:
+            reward = 20 // self.speed_step
+            done = True
+        
+        if (self.target_distance_range[1] < self.drone_distance) and self.drone_speed == 0:
+            reward = -5
             done = True
         
         elif 0 <= self.drone_distance < self.target_distance_range[1]:
-            reward = -10
+            reward = -50
             done = True
         
         else:
@@ -133,7 +115,7 @@ class DroneEnv():
 
         print(f"Drone position: {self.drone_position[0]}")
         print(f"Target position: {self.target_position[0]}")
-        print(f"Drone Distance: {self.drone_distance}")
+        print(f"Drone speed: {self.drone_speed} | Drone distance: {self.drone_distance}")
 
         return self.state, reward, done, {}
 
@@ -159,10 +141,10 @@ class DroneEnv():
         for i in range(int(self.screen_width // change_scale)):
             pygame.draw.line(self.screen, self.black, (i * change_scale, 0), (i * change_scale, self.screen_height), self.line_thickness)
 
-        self.distance_5_meter_position = (self.target_position[0] - (5 * self.scale), self.target_position[0] - (5 * self.scale))
-        self.distance_7_meter_position = (self.target_position[0] - (7 * self.scale), self.target_position[0] - (7 * self.scale))
-        self.distance_30_meter_position = (self.drone_position[0] + (30 * self.scale), self.drone_position[0] + (30 * self.scale))
-
+        self.distance_5_meter_position = (self.target_position[0] - (self.target_distance_range[1] * self.scale), self.target_position[0] - (self.target_distance_range[1] * self.scale))
+        self.distance_7_meter_position = (self.target_position[0] - ((self.target_distance_range[1] + 2) * self.scale), self.target_position[0] - ((self.target_distance_range[1] + 2) * self.scale))
+        self.distance_30_meter_position = (self.drone_position[0] + (self.max_distance * self.scale), self.drone_position[0] + (self.max_distance * self.scale))
+        
         # 5 meter Distance from object
         pygame.draw.line(self.screen, self.blue, (self.distance_5_meter_position[0], 0), (self.distance_5_meter_position[1], self.screen_height), self.line_thickness * 2)
         pygame.draw.line(self.screen, self.blue, (self.distance_5_meter_position[0] + 2, 0), (self.distance_5_meter_position[1] + 2, self.screen_height), self.line_thickness * 2)

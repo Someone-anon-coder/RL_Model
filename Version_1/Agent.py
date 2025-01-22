@@ -18,7 +18,7 @@ class QLearningAgent:
         """
 
         self.env = env
-        self.env.set_variables(target_position = (5 * self.env.screen_width // 6, self.env.screen_height // 2))
+        self.env.reset()
         
         self.alpha = alpha  # Learning rate
         self.gamma = gamma  # Discount factor
@@ -115,13 +115,14 @@ class QLearningAgent:
             print(f"File {filename} not found. Starting with an empty Q-table.")
             self.initialize_q_table()
     
-    def train(self, episodes: int=1000, delay: int=500) -> None:
+    def train(self, episodes: int=1000, delay: int=500, render: bool=False) -> None:
         """
             Train the Q-learning agent by interacting with the environment.
 
             Args:
-                episodes: Number of episodes to train the agent.
-                delay: Delay between episodes (in milliseconds).
+                episodes: Number of episodes to train the agent. Default is 1000.
+                delay: Delay between episodes (in milliseconds). Default is 500.
+                render: Whether to render the environment. Default is False.
         """
         
         self.initialize_q_table()
@@ -144,14 +145,13 @@ class QLearningAgent:
                 state = next_state
                 total_reward += reward
 
-                self.env.render()
-                pygame.display.flip()
+                if render:
+                    self.env.render()
+                    pygame.display.flip()
                 
-                time.sleep(0.1)
-                # pygame.time.wait(3000)
-
-            # pygame.time.wait(3000)
-            pygame.time.wait(delay)
+                    time.sleep(0.1)
+                    pygame.time.wait(delay)
+            
             if episode % 10 == 0:
                 print(f"Episode {episode}/{episodes}, Total Reward: {total_reward}")
 
@@ -161,4 +161,4 @@ if __name__ == "__main__":
     agent = QLearningAgent(env)
     agent.train(episodes=1000, delay=500)
 
-    agent.save_agent("agent.pkl")
+    agent.save_agent("agent_2.pkl")
