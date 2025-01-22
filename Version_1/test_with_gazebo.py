@@ -191,7 +191,7 @@ def main():
                         action = get_action(agent, speed, distance)
                         cv2.putText(frame, f"\nAction: {"Increasing Speed" if action == 0 else "Decreasing Speed" if action == 1 else "Constant Speed"}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                        # TODO: Set the drone speed
+                        # TODO: Implement this function to set the drone speed
                         set_drone_speed(speed)
 
                 cv2.imshow("GStreamer Video Stream", frame)
