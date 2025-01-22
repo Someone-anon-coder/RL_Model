@@ -80,7 +80,7 @@ def main():
     env.set_variables(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
 
     # Initialize the agent
-    agent = QLearningAgent()
+    agent = QLearningAgent(env=env)
     agent.load_agent()
     
     # Choose action based on Q-table
