@@ -46,7 +46,7 @@ class QLearningAgent:
             for distance in range(0, 32): # 0 to 31, 31 is the distance when target is not visible
                 self.q_table[(speed, distance)] = [0.0, 0.0, 0.0]
     
-    def choose_action(self, state: tuple) -> int:
+    def choose_action(self, state: tuple, test: bool=False) -> int:
         """
             Choose an action based on epsilon-greedy strategy.
         
@@ -56,6 +56,8 @@ class QLearningAgent:
             Returns:
                 action: The action to take (0: Increase, 1: Decrease, 2: Constant).
         """
+        if test:
+            self.epsilon = 0
 
         if random.uniform(0, 1) < self.epsilon:
             return random.choice([0, 1, 2])  # Exploration: random action

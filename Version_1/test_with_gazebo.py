@@ -50,7 +50,7 @@ def get_action(agent: QLearningAgent,speed: int, distance: int) -> int:
     """Determine the action based on speed and distance"""
 
     state = np.array([speed, distance])
-    action = agent.choose_action(state)
+    action = agent.choose_action(state, test=True)
 
     return action
 

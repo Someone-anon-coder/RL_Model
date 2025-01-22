@@ -34,7 +34,7 @@ def test_agent() -> None:
             # pygame.time.Clock().tick(60)
 
         while not done:
-            action = agent.choose_action(state)
+            action = agent.choose_action(state, test=True)
             next_state, _, done, _ = env.step(action)
             state = next_state
 
