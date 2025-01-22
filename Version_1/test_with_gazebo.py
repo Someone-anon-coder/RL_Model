@@ -8,6 +8,7 @@ from gi.repository import Gst, GLib
 
 from pymavlink import mavutil
 from Agent import QLearningAgent
+from Drone_Env import DroneEnv
 
 class Tracker:
     def __init__(self):
@@ -74,6 +75,10 @@ def on_message(bus, message, loop):
         loop.quit()
 
 def main():
+    # Initialize the environment
+    env = DroneEnv()
+    env.set_variables(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
+
     # Initialize the agent
     agent = QLearningAgent()
     agent.load_agent()
@@ -166,6 +171,7 @@ def main():
                     if bbox_manual:    
                         object_size_in_image = bbox_manual[2]
                         distance = tracker.calculate_distance(object_size_in_image, focal_length, real_object_size)
+                        env.target_position = (distance, env.screen_height // 2)
                         
                         if msg:
                             speed = get_drone_speed(msg)
