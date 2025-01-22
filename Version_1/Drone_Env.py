@@ -122,9 +122,6 @@ class DroneEnv():
     def render(self) -> None:
         """
             Render the environment to the screen.
-
-            Args:
-                target_position (tuple): The position of the target.
         """
 
         self.screen.fill((255, 255, 255))

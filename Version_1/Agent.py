@@ -52,6 +52,7 @@ class QLearningAgent:
         
             Args:
                 state: Current state (drone_speed, drone_distance).
+                test: Whether to test the agent (True) or train the agent (False). Default is False.
         
             Returns:
                 action: The action to take (0: Increase, 1: Decrease, 2: Constant).
