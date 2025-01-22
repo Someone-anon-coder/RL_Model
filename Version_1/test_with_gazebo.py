@@ -1,10 +1,12 @@
 import gi
 import cv2
+import time
 import numpy as np
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib
 
+from pymavlink import mavutil
 from Agent import QLearningAgent
 
 class Tracker:
@@ -38,9 +40,16 @@ class Tracker:
                     int(bbox[2] + scale_factor * 20), int(bbox[3] + scale_factor * 20))
         return new_bbox
 
-def get_drone_speed():
+def get_drone_speed(msg) -> int:
     """Get the drone speed from the environment"""
-    pass
+    
+    speed_x = msg.vx / 100  # Convert from cm/s to m/s
+    speed_y = msg.vy / 100
+    speed_z = msg.vz / 100
+    
+    # Calculate the overall speed
+    speed = (speed_x**2 + speed_y**2 + speed_z**2)**0.5
+    return int(speed)
 
 def set_drone_speed(speed: int):
     """Set the drone speed in the environment"""
@@ -114,10 +123,29 @@ def main():
     cv2.namedWindow("GStreamer Video Stream")
     cv2.setMouseCallback("GStreamer Video Stream", on_mouse_click)
 
+    # Connect to PX4 (replace with your connection details)
+    connection_string = 'udp:localhost:14540'  # Change if needed
+    master = mavutil.mavlink_connection(connection_string)
+
+    # Wait for a heartbeat to confirm connection
+    master.wait_heartbeat()
+    print("Connected to PX4.")
+
+    # Request data stream to get speed information
+    master.mav.request_data_stream_send(
+        master.target_system, 
+        master.target_component,
+        mavutil.mavlink.MAV_DATA_STREAM_ALL, 
+        1, 
+        1
+    )
+
     try:
         print("Streaming video... Press Ctrl+C to stop.")
         while True:
             sample = appsink.emit("pull-sample")
+            msg = master.recv_match(type='GLOBAL_POSITION_INT', blocking=False)
+            
             if sample:
                 buffer = sample.get_buffer()
                 caps = sample.get_caps()
@@ -139,8 +167,10 @@ def main():
                         object_size_in_image = bbox_manual[2]
                         distance = tracker.calculate_distance(object_size_in_image, focal_length, real_object_size)
                         
-                        # TODO: Get the drone speed
-                        speed = get_drone_speed()
+                        if msg:
+                            speed = get_drone_speed(msg)
+                        else:
+                            print("Speed: No data available.")
                         
                         bbox_manual = tracker.adjust_bbox(bbox_manual, distance)
 
@@ -159,7 +189,7 @@ def main():
                         
                         # Action based based on state, [0: Increase, 1: Decrease, 2: Constant]
                         action = get_action(agent, speed, distance)
-                        cv2.putText(frame, f"Action: {"Increasing Speed" if action == 0 else "Decreasing Speed" if action == 1 else "Constant Speed"}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                        cv2.putText(frame, f"\nAction: {"Increasing Speed" if action == 0 else "Decreasing Speed" if action == 1 else "Constant Speed"}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                         # TODO: Set the drone speed
                         set_drone_speed(speed)
