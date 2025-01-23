@@ -31,7 +31,9 @@ class Tracker:
     def calculate_distance(self, object_size, focal_length, real_object_size):
         """Estimate the distance of the object"""
         distance = (real_object_size * focal_length) / object_size
-        return int(distance)
+        distance = round(distance * 2) / 2
+
+        return distance
 
     def adjust_bbox(self, bbox, distance, max_distance=1000):
         """Dynamically adjust the bounding box size based on distance"""
@@ -51,18 +53,20 @@ def get_drone_speed(msg) -> int:
     speed = (speed_x**2 + speed_y**2 + speed_z**2)**0.5
     return int(speed)
 
-def set_drone_speed(action: int, speed: int) -> None:
+def set_drone_speed(master, action: int, speed: int) -> None:
     """
         Send DO_CHANGE_SPEED command
 
         Args:
+            master: MAVLink connection
+            action: action to take (0: Increase, 1: Decrease, 2: Maintain)
             speed: ground speed in m/s
     """
 
     if action == 0:
-        speed += 1
+        speed += 0.5
     elif action == 1:
-        speed -= 1
+        speed -= 0.5
     
     master.mav.command_long_send(
         master.target_system,
@@ -104,7 +108,7 @@ def main():
 
     # Initialize the agent
     agent = QLearningAgent(env=env)
-    agent.load_agent('agent_4.pkl')
+    agent.load_agent('agent_5.pkl')
     
     # Choose action based on Q-table
     agent.epsilon = 0
@@ -139,7 +143,7 @@ def main():
 
     # Camera parameters
     focal_length = 800
-    real_object_size = 0.8
+    real_object_size = 0.9
 
     def on_mouse_click(event, x, y, flags, param):
         nonlocal manual_tracking_active, bbox_manual
@@ -222,7 +226,7 @@ def main():
                         cv2.putText(frame, f"Speed: {current_speed} m/s", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                         # Set the drone speed based on the action
-                        set_drone_speed(action, current_speed)
+                        set_drone_speed(master, action, current_speed)
 
                 cv2.imshow("GStreamer Video Stream", frame)
 
