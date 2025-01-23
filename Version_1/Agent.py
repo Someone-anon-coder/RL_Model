@@ -159,7 +159,7 @@ class QLearningAgent:
 if __name__ == "__main__":
     env = DroneEnv()
     
-    agent = QLearningAgent(env)
-    agent.train(episodes=1000, delay=500)
+    agent = QLearningAgent(env, epsilon=0.8)
+    agent.train(episodes=7000, delay=500)
 
-    agent.save_agent("agent_2.pkl")
+    agent.save_agent("agent_4.pkl")

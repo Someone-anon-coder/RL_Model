@@ -44,7 +44,7 @@ class DroneEnv():
         self.speed_step = 1
         self.max_distance = 30
 
-        self.target_distance_range = (0, 8)
+        self.target_distance_range = (0, 5)
 
         self.drone_position = (self.screen_width // 10, self.screen_height // 2)
         if target_position is not None:
@@ -91,6 +91,7 @@ class DroneEnv():
                 self.speed_step += 1
         
         if self.drone_position[0] < self.distance_30_meter_position[0]:
+            self.drone_distance = abs(self.target_position[0] - (self.drone_position[0] + self.drone_dimension)) // self.scale
             self.drone_distance -= self.drone_speed
         else:
             self.drone_distance -= 1
@@ -110,12 +111,16 @@ class DroneEnv():
             reward = -50
             done = True
         
+        elif (self.drone_distance < self.target_distance_range[1]) and (action == 1):
+            reward = 10
+
         else:
             reward = -1
 
         print(f"Drone position: {self.drone_position[0]}")
         print(f"Target position: {self.target_position[0]}")
         print(f"Drone speed: {self.drone_speed} | Drone distance: {self.drone_distance if self.drone_distance < 31 else 31}")
+        print(f"Action: {'Increase Speed' if action == 0 else 'Decrease Speed' if action == 1 else 'Maintain Speed'}")
 
         return self.state, reward, done, {}
 

@@ -10,7 +10,7 @@ def test_agent() -> None:
     env.reset()
 
     agent = QLearningAgent(env)
-    agent.load_agent("agent_2.pkl")
+    agent.load_agent("agent_4.pkl")
     # agent.load_agent()
 
     while True:
@@ -53,18 +53,17 @@ def test_agent() -> None:
                     exit()
 
 if __name__ == "__main__":
-    # test_agent()
-    env = DroneEnv()
-    env.reset(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
+    test_agent()
+    # env = DroneEnv()
+    # env.reset(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
     
-    agent = QLearningAgent(env)
-    agent.load_agent("agent_2.pkl")
+    # agent = QLearningAgent(env)
+    # agent.load_agent("agent_2.pkl")
 
-    print(f"\n\nTesting...")
-    for _ in range(20):
-        state = numpy.array([random.randint(0, 5), random.randint(0, 31)])
+    # print(f"\n\nTesting...")
+    # for _ in range(20):
+    #     state = numpy.array([random.randint(0, 5), random.randint(0, 31)])
+    #     action = agent.choose_action(state, test=True)
 
-        print(f"Speed: {state[0]} | Distance: {state[1]}")
-
-        action = agent.choose_action(state, test=True)
-        print(f"{'Increase Speed' if action == 0 else 'Decrease Speed' if action == 1 else 'Maintain Speed'}")
+    #     print(f"Speed: {state[0]} | Distance: {state[1]}")
+    #     print(f"{'Increase Speed' if action == 0 else 'Decrease Speed' if action == 1 else 'Maintain Speed'}")
