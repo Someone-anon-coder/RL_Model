@@ -79,7 +79,7 @@ def on_message(bus, message, loop):
 def main():
     # Initialize the environment
     env = DroneEnv()
-    env.set_variables(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
+    env.reset()
 
     # Initialize the agent
     agent = QLearningAgent(env=env)
