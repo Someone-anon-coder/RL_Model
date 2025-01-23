@@ -25,25 +25,14 @@ class QLearningAgent:
         self.epsilon = epsilon  # Exploration rate
         
         self.q_table = {}
-        
-    def get_state_key(self, state: tuple) -> tuple:
-        """
-            Convert state (drone_speed, drone_distance) into a tuple for Q-table indexing.
-
-            Args:
-                state (tuple): The current state of the environment.
-        """
-        
-        speed, distance = state
-        return (speed, distance)
 
     def initialize_q_table(self) -> None:
         """
             Initialize Q-table with zeros for all possible state-action pairs.
         """
         
-        for speed in range(6):
-            for distance in range(0, 32): # 0 to 31, 31 is the distance when target is not visible
+        for speed in range(11):
+            for distance in range(0, 62): # 0 to 61, 62 is the distance when target is not visible
                 self.q_table[(speed, distance)] = [0.0, 0.0, 0.0]
     
     def choose_action(self, state: tuple, test: bool=False) -> int:
@@ -162,4 +151,4 @@ if __name__ == "__main__":
     agent = QLearningAgent(env, epsilon=0.8)
     agent.train(episodes=7000, delay=500)
 
-    agent.save_agent("agent_4.pkl")
+    agent.save_agent("agent_5.pkl")

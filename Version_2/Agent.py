@@ -20,10 +20,10 @@ class DQN(nn.Module):
 
         super(DQN, self).__init__()
 
-        self.fc1 = nn.Linear(input_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, 64)
-        self.fc4 = nn.Linear(64, output_dim)
+        self.fc1 = nn.Linear(input_dim, 32)
+        self.fc2 = nn.Linear(32, 64)
+        self.fc3 = nn.Linear(64, 32)
+        self.fc4 = nn.Linear(32, output_dim)
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -267,8 +267,8 @@ class DQNAgent:
 
 if __name__ == "__main__":
     env = DroneEnv()
-    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.9, epsilon_decay=0.99999, epsilon_min=0.1, batch_size=32, memory_size=10000)
+    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.9)
     
     # agent.train(episodes=20000, target_update_freq=100, render=True, render_freq=500)
-    agent.train(episodes=15000, target_update_freq=100)
+    agent.train(episodes=10000, target_update_freq=100)
     agent.save_agent()

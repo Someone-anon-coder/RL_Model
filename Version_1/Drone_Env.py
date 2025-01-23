@@ -45,6 +45,8 @@ class DroneEnv():
         self.max_distance = 30
 
         self.target_distance_range = (0, 5)
+        self.within_target_range = False
+        self.target_range_stop_time = 0
 
         self.drone_position = (self.screen_width // 10, self.screen_height // 2)
         if target_position is not None:
@@ -62,7 +64,7 @@ class DroneEnv():
         print(f"Target position: {self.target_position[0]}")
         print(f"Speed: {self.drone_speed} | Distance: {self.drone_distance if self.drone_distance < 31 else 31}")
 
-        self.state = np.array([self.drone_speed, self.drone_distance if self.drone_distance < 31 else 31])  # Reset to initial speed and max distance
+        self.state = np.array([self.drone_speed * 2, self.drone_distance if self.drone_distance < 31 else 31])  # Reset to initial speed and max distance
         return self.state
     
     def step(self, action: int) -> tuple:
@@ -80,11 +82,11 @@ class DroneEnv():
 
         if self.drone_position[0] < self.distance_30_meter_position[0]:
             if action == 0:
-                self.drone_speed = min(self.drone_speed + 1, self.max_speed)
+                self.drone_speed = min(self.drone_speed + 0.5, self.max_speed)
                 self.speed_step += 1
             
             elif action == 1:
-                self.drone_speed = max(self.drone_speed - 1, 0)
+                self.drone_speed = max(self.drone_speed - 0.5, 0)
                 self.speed_step += 1
             
             elif action == 2:
@@ -97,15 +99,18 @@ class DroneEnv():
             self.drone_distance -= 1
         
         self.target_position = (self.target_position[0] - self.drone_speed * self.scale, self.target_position[1])
-        self.state = np.array([self.drone_speed, self.drone_distance if self.drone_distance < 31 else 31])
+        self.state = np.array([self.drone_speed * 2, (self.drone_distance * 2) if (self.drone_distance * 2) < 61 else 61])
 
         if (self.target_distance_range[0] <= self.drone_distance <= self.target_distance_range[1]) and self.drone_speed == 0:
-            reward = 50 // self.speed_step
-            done = True
+            if self.within_target_range:
+                self.target_range_stop_time += 1
+                if self.target_range_stop_time > 5:
+                    reward = 100
+                    done = True
         
         if (self.target_distance_range[1] < self.drone_distance) and self.drone_speed == 0:
             reward = -10
-            done = True
+            # done = True
         
         elif 0 <= self.drone_distance < self.target_distance_range[1]:
             reward = -50

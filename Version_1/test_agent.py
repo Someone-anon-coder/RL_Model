@@ -10,7 +10,7 @@ def test_agent() -> None:
     env.reset()
 
     agent = QLearningAgent(env)
-    agent.load_agent("agent_4.pkl")
+    agent.load_agent("agent_5.pkl")
     # agent.load_agent()
 
     while True:
@@ -39,6 +39,22 @@ def test_agent() -> None:
             # pygame.time.Clock().tick(60)
 
         while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    x, _ = pygame.mouse.get_pos()
+                    
+                    positions = [i for i in range(0, env.screen_width, env.scale)]
+                    x = min(positions, key=lambda p: abs(p - x)) + env.scale // 2 # Round to the nearest grid position
+
+                    target_position = (x, env.screen_height // 2)
+                    
+                    state = env.reset(target_position=target_position)
+                    # target_position_set = True
+
             action = agent.choose_action(state, test=True)
             next_state, _, done, _ = env.step(action)
             state = next_state
@@ -46,11 +62,6 @@ def test_agent() -> None:
             env.render()
             pygame.display.flip()
             pygame.time.Clock().tick(60)
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
 
 if __name__ == "__main__":
     test_agent()
