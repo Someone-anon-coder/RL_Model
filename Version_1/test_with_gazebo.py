@@ -51,9 +51,30 @@ def get_drone_speed(msg) -> int:
     speed = (speed_x**2 + speed_y**2 + speed_z**2)**0.5
     return int(speed)
 
-def set_drone_speed(speed: int):
-    """Set the drone speed in the environment"""
-    pass
+def set_drone_speed(action: int, speed: int) -> None:
+    """
+        Send DO_CHANGE_SPEED command
+
+        Args:
+            speed: ground speed in m/s
+    """
+
+    if action == 0:
+        speed += 1
+    elif action == 1:
+        speed -= 1
+    
+    master.mav.command_long_send(
+        master.target_system,
+        master.target_component,
+        mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+        0,  # confirmation
+        1,  # ground speed
+        speed,  # speed in m/s
+        -1,  # no change to throttle
+        0,  # absolute speed
+        0, 0, 0  # unused parameters
+    )
 
 def get_action(agent: QLearningAgent,speed: int, distance: int) -> int:
     """Determine the action based on speed and distance"""
@@ -83,7 +104,7 @@ def main():
 
     # Initialize the agent
     agent = QLearningAgent(env=env)
-    agent.load_agent()
+    agent.load_agent('agent_4.pkl')
     
     # Choose action based on Q-table
     agent.epsilon = 0
@@ -118,7 +139,7 @@ def main():
 
     # Camera parameters
     focal_length = 800
-    real_object_size = 5
+    real_object_size = 0.8
 
     def on_mouse_click(event, x, y, flags, param):
         nonlocal manual_tracking_active, bbox_manual
@@ -176,7 +197,7 @@ def main():
                         env.target_position = (distance, env.screen_height // 2)
                         
                         if msg:
-                            speed = get_drone_speed(msg)
+                            current_speed = get_drone_speed(msg)
                         else:
                             print("Speed: No data available.")
                         
@@ -196,11 +217,12 @@ def main():
                                    2)
                         
                         # Action based based on state, [0: Increase, 1: Decrease, 2: Constant]
-                        action = get_action(agent, speed, distance)
-                        cv2.putText(frame, f"\nAction: {"Increasing Speed" if action == 0 else "Decreasing Speed" if action == 1 else "Constant Speed"}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                        action = get_action(agent, current_speed, distance)
+                        cv2.putText(frame, f"\nAction: {'Increasing Speed' if action == 0 else 'Decreasing Speed' if action == 1 else 'Constant Speed'}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                        cv2.putText(frame, f"Speed: {current_speed} m/s", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                        # TODO: Implement this function to set the drone speed
-                        set_drone_speed(speed)
+                        # Set the drone speed based on the action
+                        set_drone_speed(action, current_speed)
 
                 cv2.imshow("GStreamer Video Stream", frame)
 
