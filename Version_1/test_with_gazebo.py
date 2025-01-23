@@ -33,7 +33,7 @@ class Tracker:
         distance = (real_object_size * focal_length) / object_size
         distance = round(distance * 2) / 2
 
-        return distance
+        return (distance * 2)
 
     def adjust_bbox(self, bbox, distance, max_distance=1000):
         """Dynamically adjust the bounding box size based on distance"""
