@@ -37,7 +37,7 @@ The goal is to develop a system of agents that control various aspects of the dr
    ```
 
 ## Usage
-To run the agents, execute the following commands:
+To train the agents, execute the following commands:
 
 - For Version 1:
   ```bash
@@ -47,6 +47,19 @@ To run the agents, execute the following commands:
 - For Version 2:
   ```bash
   python Version_2/Agent.py
+  ```
+
+## Testing
+To test the agents, execute the following commands:
+
+- For Version 1:
+  ```bash
+  python Version_1/test_agent.py
+  ```
+
+- For Version 2:
+  ```bash
+  python Version_2/test_agent.py
   ```
 
 ## Contributing
