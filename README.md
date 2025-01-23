@@ -28,7 +28,7 @@ The goal is to develop a system of agents that control various aspects of the dr
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Someone-anon-coder/RL_Model.git
    cd RL_Model
    ```
 2. Install the required packages:
