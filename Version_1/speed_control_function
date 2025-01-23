@@ -1,0 +1,28 @@
+def change_speed(speed):
+    """
+    Send DO_CHANGE_SPEED command
+    speed: ground speed in m/s
+    """
+    master.mav.command_long_send(
+        master.target_system,
+        master.target_component,
+        mavutil.mavlink.MAV_CMD_DO_CHANGE_SPEED,
+        0,  # confirmation
+        1,  # ground speed
+        speed,  # speed in m/s
+        -1,  # no change to throttle
+        0,  # absolute speed
+        0, 0, 0  # unused parameters
+    )
+    
+    
+    
+#Call this function wherever speed needs to be changed
+# To slow down when detecting obstacle:
+change_speed(5.0)  # Reduces speed to 5 m/s
+
+# To stop:
+change_speed(0)  # Stops the drone
+
+# To return to normal speed:
+change_speed(8.0)  # Back to 8 m/s
