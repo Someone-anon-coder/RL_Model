@@ -10,40 +10,84 @@ from Agent import QLearningAgent
 from Drone_Env import DroneEnv
 
 class Tracker:
-    def __init__(self):
+    def __init__(self) -> None:
         self.trackers = {}
         self.locked_object_id = None
         self.manual_tracker = None
 
-    def lock_object(self, frame, bbox):
-        """Lock an object for tracking"""
+    def lock_object(self, frame: cv2.Mat, bbox: list) -> None:
+        """
+            Lock an object for tracking
+        
+            Args:
+                frame (cv2.Mat): The frame where the object is detected.
+                bbox (list): The bounding box coordinates of the object.
+        """
+        
         self.manual_tracker = cv2.TrackerCSRT_create()
         self.manual_tracker.init(frame, bbox)
 
-    def track_object(self, frame):
-        """Track the manually selected object"""
+    def track_object(self, frame: cv2.Mat) -> None | list:
+        """
+            Track the manually selected object
+
+            Args:
+                frame (cv2.Mat): The frame where the object is detected.
+        """
+        
         if self.manual_tracker is not None:
             success, bbox = self.manual_tracker.update(frame)
             if success:
                 return [int(v) for v in bbox]
         return None
 
-    def calculate_distance(self, object_size, focal_length, real_object_size):
-        """Estimate the distance of the object"""
+    def calculate_distance(self, object_size: float, focal_length: float, real_object_size: float) -> float:
+        """
+            Estimate the distance of the object
+
+            Args:
+                object_size (float): The size of the object in pixels.
+                focal_length (float): The focal length of the camera.
+                real_object_size (float): The real size of the object in meters.
+            
+            Returns:
+                float: The estimated distance of the object in meters.
+        """
+        
         distance = (real_object_size * focal_length) / object_size
         distance = round(distance * 2) / 2
 
         return (distance * 2)
 
-    def adjust_bbox(self, bbox, distance, max_distance=1000):
-        """Dynamically adjust the bounding box size based on distance"""
+    def adjust_bbox(self, bbox: list, distance: float, max_distance: int=1000) -> list:
+        """
+            Dynamically adjust the bounding box size based on distance
+
+            Args:
+                bbox (list): The bounding box coordinates of the object.
+                distance (float): The distance of the object.
+                max_distance (int): The maximum distance of the object. Default is 1000.
+            
+            Returns:
+                list: The adjusted bounding box coordinates.
+        """
+        
         scale_factor = max(1, distance / max_distance)
         new_bbox = (int(bbox[0] - scale_factor * 10), int(bbox[1] - scale_factor * 10),
                     int(bbox[2] + scale_factor * 20), int(bbox[3] + scale_factor * 20))
+        
         return new_bbox
 
-def get_drone_speed(msg) -> int:
-    """Get the drone speed from the environment"""
+def get_drone_speed(msg: Gst.Message) -> float:
+    """
+        Get the drone speed from the environment
+
+        Args:
+            msg (Gst.Message): The message from the environment.
+        
+        Returns:
+            float: The drone speed.
+    """
     
     speed_x = msg.vx / 100  # Convert from cm/s to m/s
     speed_y = msg.vy / 100
@@ -101,7 +145,16 @@ def get_action(agent: QLearningAgent,speed: float, distance: float) -> int:
 
     return action
 
-def on_message(bus, message, loop):
+def on_message(bus: Gst.Bus, message: Gst.Message, loop: Gst.EventLoop) -> None:
+    """
+        Handle GStreamer bus messages
+    
+        Args:
+            bus: GStreamer bus
+            message: GStreamer message
+            loop: GStreamer event loop
+    """
+    
     message_type = message.type
     if message_type == Gst.MessageType.EOS:
         print("End-Of-Stream reached")
@@ -155,7 +208,18 @@ def main():
     focal_length = 800
     real_object_size = 0.9
 
-    def on_mouse_click(event, x, y, flags, param):
+    def on_mouse_click(event, x: int, y: int, flags, param) -> None:
+        """
+            Handle mouse click event.
+
+            Args:
+                event: Mouse event type
+                x: X-coordinate of the click
+                y: Y-coordinate of the click
+                flags: Mouse button flags
+                param: Additional parameters
+        """
+        
         nonlocal manual_tracking_active, bbox_manual
         if event == cv2.EVENT_LBUTTONDOWN:
             bbox_manual = (x - 25, y - 25, 50, 50)
