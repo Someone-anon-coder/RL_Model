@@ -14,6 +14,7 @@ def test_agent() -> None:
     # agent.load_agent()
 
     while True:
+        print("\n\nStarting Testing...\n\n")
         done = False
 
         target_position_set = False

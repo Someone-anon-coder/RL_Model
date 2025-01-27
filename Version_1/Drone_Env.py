@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+import random
 
 class DroneEnv():
     def __init__(self) -> None:
@@ -52,7 +53,8 @@ class DroneEnv():
         if target_position is not None:
             self.target_position = target_position
         else:
-            self.target_position = (self.screen_width + 1, self.screen_height // 2)
+            # self.target_position = (self.screen_width + 1, self.screen_height // 2)
+            self.target_position = self.get_target_position()
 
         self.drone_distance = abs(self.target_position[0] - (self.drone_position[0] + self.drone_dimension)) // self.scale
 
@@ -66,6 +68,17 @@ class DroneEnv():
 
         self.state = np.array([self.drone_speed * 2, self.drone_distance if self.drone_distance < 31 else 31])  # Reset to initial speed and max distance
         return self.state
+
+    def get_target_position(self) -> tuple:
+        """
+            Get the target position.
+
+            Returns:
+                tuple: The position of the target.
+        """
+
+        x_position = random.randint(self.screen_width // 2, self.screen_width - self.drone_dimension * self.scale)
+        return (x_position, self.screen_height // 2)
     
     def step(self, action: int) -> tuple:
         """
@@ -166,8 +179,8 @@ class DroneEnv():
 
 if __name__ == "__main__":
     env = DroneEnv()
+    env.reset()
 
-    env.set_variables(target_position=(5 * env.screen_width // 6, env.screen_height // 2))
     while True:
         env.render()
         pygame.display.flip()
