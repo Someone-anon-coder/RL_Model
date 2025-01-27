@@ -3,8 +3,8 @@
 ## Description
 This project aims to create an autonomous drone using Reinforcement Learning (RL) and Deep Q-Learning (DQN) with a hierarchical agent approach. The project is divided into two versions:
 
-- **Version 1**: Focuses on speed control of the drone to stop at 5 meters from an obstacle.
-- **Version 2**: Aims to navigate towards a target while avoiding obstacles.
+- **Version 1**: Focuses on speed control of the drone to stop at 5 meters from an obstacle using Q-learning.
+- **Version 2**: Aims to navigate towards a target while avoiding obstacles using DQN.
 
 The goal is to develop a system of agents that control various aspects of the drone to create a fully autonomous flying machine.
 
@@ -15,6 +15,8 @@ The goal is to develop a system of agents that control various aspects of the dr
 - **Key Components**:
   - `Agent.py`: Implements the Q-learning agent.
   - `Drone_Env.py`: Defines the environment in which the drone operates.
+  - `speed_input_control.py`: Handles speed input for the drone.
+  - `get_speed.py`: Retrieves the current speed of the drone.
   - `test_agent.py`: Contains tests for the Q-learning agent.
   - `test_with_gazebo.py`: Integrates the agent with Gazebo for simulation.
 
