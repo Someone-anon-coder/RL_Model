@@ -64,9 +64,9 @@ def set_drone_speed(master, action: int, speed: int) -> None:
     """
 
     if action == 0:
-        speed += 0.5
+        speed = min(speed + 0.5, 5)
     elif action == 1:
-        speed -= 0.5
+        speed = max(speed - 0.5, 0)
     
     master.mav.command_long_send(
         master.target_system,
@@ -80,8 +80,18 @@ def set_drone_speed(master, action: int, speed: int) -> None:
         0, 0, 0  # unused parameters
     )
 
-def get_action(agent: QLearningAgent,speed: int, distance: int) -> int:
-    """Determine the action based on speed and distance"""
+def get_action(agent: QLearningAgent,speed: float, distance: float) -> int:
+    """
+        Determine the action based on speed and distance
+    
+        Args:
+            agent: QLearningAgent instance
+            speed: current speed of the drone
+            distance: distance to the target
+        
+        Returns:
+            action: action to take (0: Increase, 1: Decrease, 2: Maintain)
+    """
 
     if distance > 31:
         distance = 31
