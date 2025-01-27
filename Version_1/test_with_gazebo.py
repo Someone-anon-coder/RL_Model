@@ -95,7 +95,7 @@ def get_drone_speed(msg: Gst.Message) -> float:
     
     # Calculate the overall speed
     speed = (speed_x**2 + speed_y**2 + speed_z**2)**0.5
-    return int(speed)
+    return speed
 
 def set_drone_speed(master, action: int, speed: int) -> None:
     """
