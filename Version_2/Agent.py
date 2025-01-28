@@ -1,3 +1,4 @@
+from sys import argv
 import time
 import random
 import pygame
@@ -169,7 +170,7 @@ class DQNAgent:
         for target_param, local_param in zip(self.target_network.parameters(), self.q_network.parameters()):
             target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
     
-    def train(self, episodes: int = 1000, target_update_freq: int = 10, render:bool = False, render_freq: int = 100) -> None:
+    def train(self, episodes: int = 1000, target_update_freq: int = 10, render:bool = False) -> None:
         """
             Train the DQN agent by interacting with the environment.
 
@@ -211,10 +212,9 @@ class DQNAgent:
                 total_reward += reward
 
                 if render:
-                    if not episode % render_freq:
-                        self.env.render()
-                        pygame.display.flip()
-                        time.sleep(0.5)
+                    self.env.render()
+                    pygame.display.flip()
+                    time.sleep(0.5)
 
             if episode % target_update_freq == 0:
                 self.update_target_network()
@@ -267,8 +267,9 @@ class DQNAgent:
 
 if __name__ == "__main__":
     env = DroneEnv()
-    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.9)
+    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.99, epsilon_min=0.1, epsilon_decay=0.99997)
     
     # agent.train(episodes=20000, target_update_freq=100, render=True, render_freq=500)
-    agent.train(episodes=10000, target_update_freq=100)
-    agent.save_agent()
+    render = argv[1] if len(argv) > 1 else False
+    agent.train(episodes=30000, target_update_freq=100, render=render)
+    agent.save_agent("agent_2.pth")
