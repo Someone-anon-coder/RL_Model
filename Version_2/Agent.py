@@ -267,9 +267,9 @@ class DQNAgent:
 
 if __name__ == "__main__":
     env = DroneEnv()
-    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.99, epsilon_min=0.1, epsilon_decay=0.99997)
+    agent = DQNAgent(env, alpha=0.0001, gamma=0.95, epsilon=0.99, epsilon_min=0.1, epsilon_decay=0.99998)
     
     # agent.train(episodes=20000, target_update_freq=100, render=True, render_freq=500)
     render = argv[1] if len(argv) > 1 else False
-    agent.train(episodes=30000, target_update_freq=100, render=render)
+    agent.train(episodes=45000, target_update_freq=100, render=render)
     agent.save_agent("agent_2.pth")

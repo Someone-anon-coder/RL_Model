@@ -78,7 +78,7 @@ class Tracker:
         
         return new_bbox
 
-def get_drone_speed(msg: Gst.Message) -> float:
+def get_drone_speed(msg) -> float:
     """
         Get the drone speed from the environment
 
@@ -145,7 +145,7 @@ def get_action(agent: QLearningAgent,speed: float, distance: float) -> int:
 
     return action
 
-def on_message(bus: Gst.Bus, message: Gst.Message, loop: Gst.EventLoop) -> None:
+def on_message(bus, message, loop) -> None:
     """
         Handle GStreamer bus messages
     
@@ -167,7 +167,7 @@ def on_message(bus: Gst.Bus, message: Gst.Message, loop: Gst.EventLoop) -> None:
 def main():
     # Initialize the environment
     env = DroneEnv()
-    env.reset()
+    env.reset(env.screen_width // 2, env.screen_height // 2)
 
     # Initialize the agent
     agent = QLearningAgent(env=env)
