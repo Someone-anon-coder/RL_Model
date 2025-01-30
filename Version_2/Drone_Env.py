@@ -40,6 +40,7 @@ class DroneEnv():
         
         self.drone_position = (self.object_dimension * self.scale // 2 + self.screen_width // 10, self.screen_height // 2)
         self.reward = 0
+        self.step_count = 0
         
         if target_position is not None:
             self.target_position = target_position
@@ -221,6 +222,8 @@ class DroneEnv():
         done = False
         previous_drone_position = self.drone_position
 
+        self.step_count += 1
+
         (
             if_obstacle_on_left, 
             if_obstacle_on_right, 
@@ -232,14 +235,14 @@ class DroneEnv():
             if_obstacle_on_right_bottom
         ) = self.if_obstacle_on_side(drone_position=previous_drone_position, diagonals=True)
         
-        self.reward += -1
+        self.reward = -1
         if action == 0:
             if if_obstacle_on_left:
                 print(f"\nDrone crashed with position: ({self.drone_position[0] - self.object_dimension * self.scale}, {self.drone_position[1]})")
                 print(f"Obstacles: ", *self.obstacles, sep=" -> ")
 
                 self.crashed_with_obstacle = True
-                self.reward += -200
+                self.reward = -200
                 done = True
             print(f"Moving left with position: {self.drone_position}")
             self.drone_position = (self.drone_position[0] - self.object_dimension * self.scale, self.drone_position[1])
@@ -251,7 +254,7 @@ class DroneEnv():
                 print(f"Obstacles: ", *self.obstacles, sep=" -> ")
 
                 self.crashed_with_obstacle = True
-                self.reward += -200
+                self.reward = -200
                 done = True
             print(f"Moving right with position: {self.drone_position}")
             self.drone_position = (self.drone_position[0] + self.object_dimension * self.scale, self.drone_position[1])
@@ -263,7 +266,7 @@ class DroneEnv():
                 print(f"Obstacles: ", *self.obstacles, sep=" -> ")
 
                 self.crashed_with_obstacle = True
-                self.reward += -200
+                self.reward = -200
                 done = True
             print(f"Moving top with position: {self.drone_position}")
             self.drone_position = (self.drone_position[0], self.drone_position[1] - self.object_dimension * self.scale)
@@ -275,7 +278,7 @@ class DroneEnv():
                 print(f"Obstacles: ", *self.obstacles, sep=" -> ")
                 
                 self.crashed_with_obstacle = True
-                self.reward += -200
+                self.reward = -200
                 done = True
             print(f"Moving bottom with position: {self.drone_position}")
             self.drone_position = (self.drone_position[0], self.drone_position[1] + self.object_dimension * self.scale)
@@ -285,20 +288,20 @@ class DroneEnv():
             print("\n\nDrone Reached the target")
             
             self.reached_target = True
-            self.reward += 100
+            self.reward = 100 // self.step_count
             done = True
         
         if self.drone_position[0] < 0 or self.drone_position[0] > self.screen_width or self.drone_position[1] < 0 or self.drone_position[1] > self.screen_height:
             print(f"\nDrone Crashed with wall with position: {self.drone_position}")
             
             self.crashed_with_wall = True
-            self.reward += -200
+            self.reward = -200
             done = True
         
         if (abs(self.drone_position[0] - self.target_position[0]) < abs(previous_drone_position[0] - self.target_position[0])) or (abs(self.drone_position[1] - self.target_position[1]) < abs(previous_drone_position[1] - self.target_position[1])):
-            self.reward += 5
+            self.reward = 5 // self.step_count
         elif (abs(self.drone_position[0] - self.target_position[0]) > abs(previous_drone_position[0] - self.target_position[0])) or (abs(self.drone_position[1] - self.target_position[1]) > abs(previous_drone_position[1] - self.target_position[1])):
-            self.reward += -5
+            self.reward = -5
 
         (
             if_obstacle_on_left, 

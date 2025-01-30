@@ -89,12 +89,13 @@ def get_drone_speed(msg) -> float:
             float: The drone speed.
     """
     
-    speed_x = msg.vx / 100  # Convert from cm/s to m/s
+    speed_x = msg.vx / 100
     speed_y = msg.vy / 100
     speed_z = msg.vz / 100
     
-    # Calculate the overall speed
     speed = (speed_x**2 + speed_y**2 + speed_z**2)**0.5
+    speed = round(speed * 2) / 2
+    
     return speed
 
 def set_drone_speed(master, action: int, speed: int) -> None:
@@ -165,15 +166,11 @@ def on_message(bus, message, loop) -> None:
         loop.quit()
 
 def main():
-    # Initialize the environment
     env = DroneEnv()
-    env.reset(env.screen_width // 2, env.screen_height // 2)
+    env.reset((env.screen_width // 2, env.screen_height // 2))
 
-    # Initialize the agent
     agent = QLearningAgent(env=env)
     agent.load_agent('agent_5.pkl')
-    
-    # Choose action based on Q-table
     agent.epsilon = 0
 
     # Initialize GStreamer
@@ -294,12 +291,10 @@ def main():
                                    (255, 0, 0), 
                                    2)
                         
-                        # Action based based on state, [0: Increase, 1: Decrease, 2: Constant]
                         action = get_action(agent, current_speed, distance)
                         cv2.putText(frame, f"\nAction: {'Increasing Speed' if action == 0 else 'Decreasing Speed' if action == 1 else 'Constant Speed'}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                         cv2.putText(frame, f"Speed: {current_speed} m/s", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-                        # Set the drone speed based on the action
                         set_drone_speed(master, action, current_speed)
 
                 cv2.imshow("GStreamer Video Stream", frame)

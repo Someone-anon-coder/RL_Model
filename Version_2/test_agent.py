@@ -8,7 +8,8 @@ def main():
     env = DroneEnv()
     
     agent = DQNAgent(env)
-    agent.load_agent()
+    # agent.load_agent()
+    agent.load_agent("agent_3.pth")
 
     while True:
         env.reset(obstacle_num=0)
